@@ -13,7 +13,7 @@ export default class HelloWorldPlugin extends Plugin {
 		const { signal } = ac;
 		const path = "/home/tate/.local/share/tinted-theming/tinty/current_scheme";
 
-		await getMatchingThemePath();
+		await getThemePath();
 
 		(async () => {
 			try {
@@ -117,7 +117,7 @@ class SampleModal extends Modal {
 	}
 }
 
-async function getCurrentColorscheme(): Promise<string> {
+async function getCurrentTintyScheme(): Promise<string> {
 	const path = "/home/tate/.local/share/tinted-theming/tinty/current_scheme";
 
 	try {
@@ -128,15 +128,29 @@ async function getCurrentColorscheme(): Promise<string> {
 	}
 }
 
-async function getMatchingThemePath(): Promise<void> {
+async function getThemePath(): Promise<void> {
 	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/plugins/obsidian-tinty/resources/themes";
-	try {
-		const scheme = await getCurrentColorscheme();
-		const schemeFile = scheme + ".css";
-		const dirArr = await readdir(path, {withFileTypes: false})
 
-		console.log(dirArr.includes(schemeFile));
+	try {
+		const scheme = await getCurrentTintyScheme();
+		const schemeFile = scheme + ".css";
+		const allThemes = await readdir(path)
+
+		console.log(allThemes.includes(schemeFile));
 	} catch (err) {
 		throw err;
 	}
 }
+
+async function createObsidianTheme(): boolean {
+	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes"
+
+	try {
+		const allThemes = await readdir(path);
+		console.log(`All themes currently in Obsidian: ${allThemes}`);
+		return allThemes.includes("obsidian-tinty.css")
+	} catch(err) {
+		throw err;
+	}
+}
+
