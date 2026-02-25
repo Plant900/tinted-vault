@@ -1,13 +1,31 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
-import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
-
-// Remember to rename these classes and interfaces!
+import { App, Editor, MarkdownView, Modal, Notice, Plugin } from 'obsidian';
+import { DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab } from "./settings";
+import { watch, readFile, readdir } from "fs/promises";
 
 export default class HelloWorldPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
+
+		// Watch tinty/current_scheme for theme change
+		const ac = new AbortController();
+		const { signal } = ac;
+		const path = "/home/tate/.local/share/tinted-theming/tinty/current_scheme";
+
+		await getMatchingThemePath();
+
+		(async () => {
+			try {
+				const watcher = watch(path, { signal });
+				for await (const event of watcher) {
+				}
+			} catch (err: any) {
+				if (err.name === 'AbortError')
+					return;
+				throw err;
+			}
+		})();
 
 		// This creates an icon in the left ribbon.
 		this.addRibbonIcon('dice', 'Greet', (evt: MouseEvent) => {
@@ -18,16 +36,17 @@ export default class HelloWorldPlugin extends Plugin {
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
 		statusBarItemEl.setText('Status bar text');
-		
+
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
 			id: 'open-modal-simple',
 			name: 'Open modal (simple)',
 			callback: () => {
 				new SampleModal(this.app).open();
+
 			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
+		});   // This adds an editor command that can perform some operation on the current editor instance
+
 		this.addCommand({
 			id: 'replace-selected',
 			name: 'Replace selected content',
@@ -88,12 +107,36 @@ class SampleModal extends Modal {
 	}
 
 	onOpen() {
-		let {contentEl} = this;
+		let { contentEl } = this;
 		contentEl.setText('Woah!');
 	}
 
 	onClose() {
-		const {contentEl} = this;
+		const { contentEl } = this;
 		contentEl.empty();
+	}
+}
+
+async function getCurrentColorscheme(): Promise<string> {
+	const path = "/home/tate/.local/share/tinted-theming/tinty/current_scheme";
+
+	try {
+		const data = await readFile(path);
+		return data.toString();
+	} catch (err) {
+		throw err;
+	}
+}
+
+async function getMatchingThemePath(): Promise<void> {
+	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/plugins/obsidian-tinty/resources/themes";
+	try {
+		const scheme = await getCurrentColorscheme();
+		const schemeFile = scheme + ".css";
+		const dirArr = await readdir(path, {withFileTypes: false})
+
+		console.log(dirArr.includes(schemeFile));
+	} catch (err) {
+		throw err;
 	}
 }
