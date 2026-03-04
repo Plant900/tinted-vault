@@ -1,35 +1,16 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin } from 'obsidian';
 import { DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab } from "./settings";
-import { watch, readFile, readdir } from "fs/promises";
+import { watch, readFile, readdir, writeFile } from "fs/promises";
 
 export default class HelloWorldPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
+		await updateObsidianTheme();
+		this.register(setThemeWatcher());
 
-		// Watch tinty/current_scheme for theme change
-		const ac = new AbortController();
-		const { signal } = ac;
-		const path = "/home/tate/.local/share/tinted-theming/tinty/current_scheme";
-
-		await getThemePath();
-
-		(async () => {
-			try {
-				const watcher = watch(path, { signal });
-				for await (const event of watcher) {
-				}
-			} catch (err: any) {
-				if (err.name === 'AbortError')
-					return;
-				throw err;
-			}
-		})();
-
-		// This creates an icon in the left ribbon.
 		this.addRibbonIcon('dice', 'Greet', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
 			new Notice('Hello');
 		});
 
@@ -37,7 +18,6 @@ export default class HelloWorldPlugin extends Plugin {
 		const statusBarItemEl = this.addStatusBarItem();
 		statusBarItemEl.setText('Status bar text');
 
-		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
 			id: 'open-modal-simple',
 			name: 'Open modal (simple)',
@@ -45,7 +25,7 @@ export default class HelloWorldPlugin extends Plugin {
 				new SampleModal(this.app).open();
 
 			}
-		});   // This adds an editor command that can perform some operation on the current editor instance
+		});  
 
 		this.addCommand({
 			id: 'replace-selected',
@@ -54,7 +34,7 @@ export default class HelloWorldPlugin extends Plugin {
 				editor.replaceSelection('Sample editor command');
 			}
 		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
+
 		this.addCommand({
 			id: 'open-modal-complex',
 			name: 'Open modal (complex)',
@@ -67,7 +47,6 @@ export default class HelloWorldPlugin extends Plugin {
 					if (!checking) {
 						new SampleModal(this.app).open();
 					}
-
 					// This command will only show up in Command Palette when the check function returns true
 					return true;
 				}
@@ -75,7 +54,6 @@ export default class HelloWorldPlugin extends Plugin {
 			}
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
@@ -128,29 +106,66 @@ async function getCurrentTintyScheme(): Promise<string> {
 	}
 }
 
-async function getThemePath(): Promise<void> {
-	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/plugins/obsidian-tinty/resources/themes";
+async function getTintyThemePath(): Promise<string> {
+	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/plugins/obsidian-tinty/resources/themes/";
 
 	try {
 		const scheme = await getCurrentTintyScheme();
 		const schemeFile = scheme + ".css";
 		const allThemes = await readdir(path)
 
-		console.log(allThemes.includes(schemeFile));
+		return allThemes.includes(schemeFile) ? path + schemeFile : 'no file';
 	} catch (err) {
 		throw err;
 	}
 }
 
-async function createObsidianTheme(): boolean {
-	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes"
+async function updateObsidianTheme(): Promise<void> {
+	const dir = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes"
+	const obsidianThemePath = dir + "/obsidian-tinty.css";
+	const tintyThemePath = await getTintyThemePath();
+	const content = await readFile(tintyThemePath, { encoding: 'utf8' });
 
 	try {
-		const allThemes = await readdir(path);
-		console.log(`All themes currently in Obsidian: ${allThemes}`);
-		return allThemes.includes("obsidian-tinty.css")
-	} catch(err) {
+		const themes = await readdir(dir);
+		console.log('writing to', obsidianThemePath, content);
+		await writeFile(obsidianThemePath, content);
+	} catch (err) {
 		throw err;
 	}
 }
 
+function setThemeWatcher(): () => void {
+	const ac = new AbortController();
+	const { signal } = ac;
+	const dirPath = "/home/tate/.local/share/tinted-theming/tinty/";
+	const debouncedUpdate = debounceFactory(updateObsidianTheme, 100);
+
+	(async () => {
+		try {
+			const watcher = watch(dirPath, { signal });
+			for await (const event of watcher) {
+				debouncedUpdate();
+			}
+		} catch (err: any) {
+			if (err.name === 'AbortError')
+				return;
+			throw err;
+		}
+	})();
+
+	return () => ac.abort();
+}
+
+function debounceFactory(func: Function, amount: number) {
+	let timeout: number | null = null;
+
+	return ((...args: any[]) => {
+		if (timeout) {
+			window.clearTimeout(timeout);
+		}
+		timeout = window.setTimeout((() => {
+			func(...args);
+		}),amount)
+	})
+}
