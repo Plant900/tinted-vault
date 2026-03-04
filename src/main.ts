@@ -6,8 +6,10 @@ export default class HelloWorldPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
+		this.app.workspace.onLayoutReady(async () => {
+			await updateObsidianTheme(this.app);
+		});
 		await this.loadSettings();
-		await updateObsidianTheme();
 		this.register(setThemeWatcher());
 
 		this.addRibbonIcon('dice', 'Greet', (evt: MouseEvent) => {
@@ -25,7 +27,7 @@ export default class HelloWorldPlugin extends Plugin {
 				new SampleModal(this.app).open();
 
 			}
-		});  
+		});
 
 		this.addCommand({
 			id: 'replace-selected',
@@ -120,16 +122,20 @@ async function getTintyThemePath(): Promise<string> {
 	}
 }
 
-async function updateObsidianTheme(): Promise<void> {
+async function updateObsidianTheme(app: App): Promise<void> {
 	const dir = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes"
 	const obsidianThemePath = dir + "/obsidian-tinty.css";
 	const tintyThemePath = await getTintyThemePath();
 	const content = await readFile(tintyThemePath, { encoding: 'utf8' });
 
 	try {
-		const themes = await readdir(dir);
 		console.log('writing to', obsidianThemePath, content);
 		await writeFile(obsidianThemePath, content);
+		const cssManager = (app as any).cssManager;
+		if (cssManager && cssManager.requestReadThemes) {
+            await cssManager.requestReadThemes();
+        }
+		console.log((app as any));
 	} catch (err) {
 		throw err;
 	}
@@ -166,6 +172,6 @@ function debounceFactory(func: Function, amount: number) {
 		}
 		timeout = window.setTimeout((() => {
 			func(...args);
-		}),amount)
+		}), amount)
 	})
 }
