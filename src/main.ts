@@ -130,7 +130,8 @@ async function updateObsidianTheme(app: App): Promise<void> {
 	try {
 		console.log('writing to', obsidianThemePath, content);
 		await writeFile(obsidianThemePath, content);
-		// const cssManager = (app as any).cssManager;
+		const cssManager = (app as any).cssManager;
+		cssManager.requestReadThemes()
 		// console.log((app as any));
 	} catch (err) {
 		throw err;
