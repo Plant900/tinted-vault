@@ -11,7 +11,6 @@ export default class HelloWorldPlugin extends Plugin {
 		});
 		await this.loadSettings();
 		this.register(setThemeWatcher());
-
 		this.addRibbonIcon('dice', 'Greet', (evt: MouseEvent) => {
 			new Notice('Hello');
 		});
@@ -131,11 +130,8 @@ async function updateObsidianTheme(app: App): Promise<void> {
 	try {
 		console.log('writing to', obsidianThemePath, content);
 		await writeFile(obsidianThemePath, content);
-		const cssManager = (app as any).cssManager;
-		if (cssManager && cssManager.requestReadThemes) {
-            await cssManager.requestReadThemes();
-        }
-		console.log((app as any));
+		// const cssManager = (app as any).cssManager;
+		// console.log((app as any));
 	} catch (err) {
 		throw err;
 	}
