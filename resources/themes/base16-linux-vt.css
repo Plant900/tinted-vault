@@ -1,3 +1,44 @@
+/*
+#000000
+#333333
+#444444
+#555555
+#888888
+#aaaaaa
+#cccccc
+#ffffff
+#aa0000
+#ff5555
+#ffff55
+#00aa00
+#00aaaa
+#5555ff
+#ff55ff
+#aa5500
+*/
+
+:root {
+	--base00:	#000000;
+	--base01: #333333;
+	--base02: #444444;
+	--base03: #555555;
+	--base04: #888888;
+	--base05: #aaaaaa;
+	--base06: #cccccc;
+	--base07: #ffffff;
+	--base08: #aa0000;
+	--base09: #ff5555;
+	--base0A: #ffff55;
+	--base0B: #00aa00;
+	--base0C: #00aaaa;
+	--base0D: #5555ff;
+	--base0E: #ff55ff;
+	--base0F: #aa5500;
+}
+
 .theme-dark {
-	--background-primary: #000000;
+	--background-primary: var(--base00);
+	--background-primary-alt: var(--base01);
+	--background-secondary: var(--base01);
+
 }

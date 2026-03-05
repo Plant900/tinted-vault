@@ -1,3 +1,44 @@
+/*
+#23262b
+#303337
+#3e4044
+#898989
+#abaaa8
+#bab9b6
+#bab9b6
+#bab9b6
+#ff8782
+#e99857
+#cfa546
+#95b659
+#42bda7
+#66b0ef
+#b799ff
+#f382d8
+*/
+
+:root {
+	--base00:	#23262b;
+	--base01: #303337;
+	--base02: #3e4044;
+	--base03: #898989;
+	--base04: #abaaa8;
+	--base05: #bab9b6;
+	--base06: #bab9b6;
+	--base07: #bab9b6;
+	--base08: #ff8782;
+	--base09: #e99857;
+	--base0A: #cfa546;
+	--base0B: #95b659;
+	--base0C: #42bda7;
+	--base0D: #66b0ef;
+	--base0E: #b799ff;
+	--base0F: #f382d8;
+}
+
 .theme-dark {
-	--background-primary: #23262b;
+	--background-primary: var(--base00);
+	--background-primary-alt: var(--base01);
+	--background-secondary: var(--base01);
+
 }

@@ -11,6 +11,7 @@ export default class HelloWorldPlugin extends Plugin {
 		});
 		await this.loadSettings();
 		this.register(setThemeWatcher());
+
 		this.addRibbonIcon('dice', 'Greet', (evt: MouseEvent) => {
 			new Notice('Hello');
 		});
@@ -98,7 +99,6 @@ class SampleModal extends Modal {
 
 async function getCurrentTintyScheme(): Promise<string> {
 	const path = "/home/tate/.local/share/tinted-theming/tinty/current_scheme";
-
 	try {
 		const data = await readFile(path);
 		return data.toString();
@@ -109,12 +109,10 @@ async function getCurrentTintyScheme(): Promise<string> {
 
 async function getTintyThemePath(): Promise<string> {
 	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/plugins/obsidian-tinty/resources/themes/";
-
 	try {
 		const scheme = await getCurrentTintyScheme();
 		const schemeFile = scheme + ".css";
 		const allThemes = await readdir(path)
-
 		return allThemes.includes(schemeFile) ? path + schemeFile : 'no file';
 	} catch (err) {
 		throw err;
@@ -124,18 +122,23 @@ async function getTintyThemePath(): Promise<string> {
 async function updateObsidianTheme(app: App): Promise<void> {
 	const dir = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes"
 	const obsidianThemePath = dir + "/obsidian-tinty.css";
-	const tintyThemePath = await getTintyThemePath();
-	const content = await readFile(tintyThemePath, { encoding: 'utf8' });
+	const content = await readTintyTheme();
 
 	try {
 		console.log('writing to', obsidianThemePath, content);
 		await writeFile(obsidianThemePath, content);
-		const cssManager = (app as any).cssManager;
-		cssManager.requestReadThemes()
-		// console.log((app as any));
+		// const cssManager = (app as any).customCss;
+		// cssManager.requestReadThemes();
 	} catch (err) {
 		throw err;
 	}
+}
+
+async function readTintyTheme(): Promise<string> {
+	const tintyThemePath = await getTintyThemePath();
+	const content = await readFile(tintyThemePath, { encoding: 'utf8' });
+
+	return content;
 }
 
 function setThemeWatcher(): () => void {
@@ -171,4 +174,11 @@ function debounceFactory(func: Function, amount: number) {
 			func(...args);
 		}), amount)
 	})
+}
+
+async function getSchemeColors(): Promise<string[]> {
+	const tintyThemePath = await getTintyThemePath();
+	let content = await readFile(tintyThemePath, { encoding: 'utf8' });
+
+	return content.split('\n').splice(1, 16);
 }
