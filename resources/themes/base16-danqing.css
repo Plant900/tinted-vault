@@ -18,7 +18,7 @@
 */
 
 :root {
-	--base00:	#2d302f;
+	--base00: #2d302f;
 	--base01: #434846;
 	--base02: #5a605d;
 	--base03: #9da8a3;
@@ -34,10 +34,91 @@
 	--base0D: #b0a4e3;
 	--base0E: #cca4e3;
 	--base0F: #ca6924;
+
+	--radius-s: 3px;
+	--radius-m: 6px;
+	--radius-l: 8px;
+	--radius-xl: 10px;
+	--modal-radius: var(--radius-m);
+	--input-radius: var(--radius-s);
+	--tab-radius: var(--radius-m);
+	--tab-radius-active: var(--radius-m);
+	--checkbox-radius: var(--radius-s);
+	--toggle-radius: var(--radius-s);
+	--toggle-thumb-radius: var(--radius-s);
+	--slider-thumb-radius: var(--radius-s);
 }
 
-.theme-dark {
+.theme-dark,
+.theme-light {
+	/* backgrounds */
 	--background-primary: var(--base00);
 	--background-primary-alt: var(--base01);
-	--background-secondary: var(--base01);
+	--background-secondary: var(--base00);
+	--background-secondary-alt: var(--base01);
+
+	/* text */
+	--text-normal: var(--base05);
+	--text-muted: var(--base04);
+	--text-faint: var(--base03);
+	--text-on-accent: var(--base00);
+
+	/* links & accent */
+	--text-accent: var(--base0D);
+	--text-link: var(--base0D);
+	--interactive-accent: var(--base0D);
+	--caret: var(--base0D);
+
+	/* selection */
+	--text-selection: var(--base02);
+	--text-highlight: var(--base02);
+
+	/* borders & dividers */
+	--background-modifier-border: var(--base02);
+	--background-modifier-border-hover: var(--base03);
+	--background-modifier-border-focus: var(--base04);
+	--divider-color: var(--base02);
+	--modal-border-color: var(--base02);
+	--prompt-border-color: var(--base02);
+
+	/* interactive elements */
+	--interactive-normal: var(--base00);
+	--interactive-hover: var(--base01);
+	--interactive-active: var(--base02);
+
+	/* editor backgrounds */
+	--background-modifier-form-field: var(--base01);
+	--background-modifier-hover: var(--base01);
+	--background-modifier-active: var(--base02);
+
+	/* tags */
+	--tag-color: var(--text-accent);
+	--tag-background: var(--base01);
+	--tag-padding-s: 0.1em;
+	--tag-padding-m: 0.1em 0.4em 0.1em 0.7em;
+	--tag-radius: 9999px;
+
+	/* editor */
+	--indentation-guides-color: var(--base02);
+	--line-height-editor: 1.6;
+	--line-height-headerless: 1.4;
+
+	/* cursor line */
+	--cursor-line-background: var(--base01);
+	--cursor-line-background-alpha: 0.5;
+
+	/* semantic colors */
+	--color-red: var(--base08);
+	--color-orange: var(--base09);
+	--color-yellow: var(--base0A);
+	--color-green: var(--base0B);
+	--color-cyan: var(--base0C);
+	--color-blue: var(--base0D);
+	--color-purple: var(--base0E);
+
+	/* text on backgrounds */
+	--text-on-primary-bg: var(--base05);
+	--icon-color: var(--base05);
+	--icon-color-hover: var(--base06);
+	--icon-active-color: var(--base07);
 }
