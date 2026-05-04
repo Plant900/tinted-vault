@@ -1,8 +1,16 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
+import { getSchemeColors } from "./tinty-utils"; 
 import MyPlugin from "./main";
 
 export interface MyPluginSettings {
 	mySetting: string;
+}
+
+interface ColorMapping {
+	"--background-primary": 0;
+	"--background-primary-alt": 1;
+	"--background-secondary": 0;
+	"--background-secondary-alt": 1;
 }
 
 export const DEFAULT_SETTINGS: MyPluginSettings = {

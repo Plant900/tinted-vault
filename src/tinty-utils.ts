@@ -68,7 +68,7 @@ export function setThemeWatcher(): () => void {
 	return () => ac.abort();
 }
 
-async function getSchemeColors(): Promise<string[]> {
+export async function getSchemeColors(): Promise<string[]> {
 	const tintyThemePath = await getTintyThemePath();
 	let content = await readFile(tintyThemePath, { encoding: 'utf8' });
 
