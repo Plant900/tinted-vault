@@ -1,18 +1,15 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin } from 'obsidian';
-import { DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab } from "./settings";
+import { DEFAULT_SETTINGS, MyPluginSettings, MySettingTab } from "./settings";
 import { updateObsidianTheme, setThemeWatcher } from "./tinty-utils";
 
-interface ObsidianTintySettings {
-	sampleValue: string;
-}
-
 export default class ObsidianTintyPlugin extends Plugin {
-	settings: ObsidianTintySettings;
+	settings: MyPluginSettings;
 
 	async onload() {
 		this.app.workspace.onLayoutReady(async () => {
 			await updateObsidianTheme(this.app);
 		});
+
 		await this.loadSettings();
 		this.register(setThemeWatcher());
 
@@ -60,7 +57,7 @@ export default class ObsidianTintyPlugin extends Plugin {
 			}
 		});
 
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		this.addSettingTab(new MySettingTab(this.app, this));
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
