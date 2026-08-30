@@ -1,6 +1,6 @@
 import { debounceFactory } from "./utils";
 import { watch, readFile, readdir, writeFile } from "fs/promises";
-import { App } from 'obsidian';
+import { ObsidianTintyPlugin } from "./main";
 
 async function getCurrentTintyScheme(): Promise<string> {
 	const path = "/home/tate/.local/share/tinted-theming/tinty/current_scheme";
@@ -24,19 +24,13 @@ async function getTintyThemePath(): Promise<string> {
 	}
 }
 
-export async function updateObsidianTheme(app: App): Promise<void> {
+export async function updateObsidianTheme(): Promise<void> {
 	const dir = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes"
 	const obsidianThemePath = dir + "/obsidian-tinty.css";
 	const content = await readTintyTheme();
 
-	try {
-		console.log('writing to', obsidianThemePath, content);
-		await writeFile(obsidianThemePath, content);
-		// const cssManager = (app as any).customCss;
-		// cssManager.requestReadThemes();
-	} catch (err) {
-		throw err;
-	}
+	console.log('writing theme to', obsidianThemePath);
+	await writeFile(obsidianThemePath, content);
 }
 
 async function readTintyTheme(): Promise<string> {
@@ -46,6 +40,7 @@ async function readTintyTheme(): Promise<string> {
 	return content;
 }
 
+// TODO: pass in the main plugin so you can update scheme colors
 export function setThemeWatcher(): () => void {
 	const ac = new AbortController();
 	const { signal } = ac;

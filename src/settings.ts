@@ -1,9 +1,13 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
-import { getSchemeColors } from "./tinty-utils"; 
+import { App, PluginSettingTab, SettingDefinitionItem } from "obsidian";
+import { getSchemeColors } from "./tinty-utils";
 import MyPlugin from "./main";
 
-export interface MyPluginSettings {
-	customizations: Record<string, Partial<ColorMapping>>;
+export interface MySettings {
+	sampleValue: string;
+}
+
+export const DEFAULT_SETTINGS: Partial<MySettings> = {
+	sampleValue: "sample",
 }
 
 interface ColorMapping {
@@ -20,10 +24,6 @@ export const TEMPLATE_DEFAULTS: ColorMapping = {
 	"--background-secondary-alt": 1,
 }
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
-	customizations: {}
-}
-
 export class MySettingTab extends PluginSettingTab {
 	plugin: MyPlugin;
 
@@ -32,26 +32,17 @@ export class MySettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	async display(): Promise<void> {
-		const { containerEl } = this;
-		containerEl.empty();
-
-		const schemeColors: string[] = await getSchemeColors();
-
-		new Setting(containerEl)
-			.setName('Background')
-			.addDropdown((dropdown) => {
-				const options: Record<string, string> = {};
-				schemeColors.forEach((hex, index) => {
-					options[index.toString()] = `base${index} - ${hex}`;
-				})
-
-				dropdown.addOptions(options);
-				dropdown.setValue('0');
-				dropdown.onChange((value) => {
-					// TO DO: Save mapping
-					console.log('hamber');
-				})
-			})
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		return [
+			{
+				name: 'Default value',
+				control: {
+					type: 'text',
+					key: 'sampleValue',
+					placeholder: 'Lorem ipsum',
+				},
+			},
+		];
 	}
 }
+
