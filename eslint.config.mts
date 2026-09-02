@@ -22,6 +22,11 @@ export default tseslint.config(
 		},
 	},
 	...obsidianmd.configs.recommended,
+	{
+		rules: {
+			"no-console": "warn",
+		},
+	},
 	globalIgnores([
 		"node_modules",
 		"dist",
