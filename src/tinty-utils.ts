@@ -48,6 +48,7 @@ export function setThemeWatcher(plugin: ObsidianTintyPlugin): () => void {
 				debouncedUpdate();
 				let content = await getSchemeColors();
 				plugin.currentThemeColors = content;
+				console.log(plugin.currentThemeColors);
 			}
 		} catch (err: unknown) {
 			if (err.name === 'AbortError')
