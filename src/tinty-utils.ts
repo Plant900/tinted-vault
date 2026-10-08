@@ -1,5 +1,6 @@
 import { debounceFactory } from "./utils";
-import { watch, readFile, readdir, writeFile } from "fs/promises";
+import { watch as fsWatch } from "fs"; 
+import { readFile, readdir, writeFile } from "fs/promises";
 import ObsidianTintyPlugin from "./main";
 
 async function getCurrentTintyScheme(): Promise<string> {
@@ -35,29 +36,19 @@ async function readTintyTheme(): Promise<string> {
 }
 
 export function setThemeWatcher(plugin: ObsidianTintyPlugin): () => void {
-	const ac = new AbortController();
-	const { signal } = ac;
-	// TODO: see if tinty CLI can programatically expose path
-	const dirPath = "/home/tate/.local/share/tinted-theming/tinty/artifacts/";
-	const debouncedUpdate = debounceFactory(updateObsidianTheme, 100);
+	const dirPath = "/home/tate/.local/share/tinted-theming/tinty/";
+	const debouncedUpdate = debounceFactory(() => updateObsidianTheme(), 300);
 
-	(async () => {
-		try {
-			const watcher = watch(dirPath, { signal });
-			for await (const event of watcher) {
-				debouncedUpdate();
-				let content = await getSchemeColors();
-				plugin.currentThemeColors = content;
-				console.log(plugin.currentThemeColors);
-			}
-		} catch (err: unknown) {
-			if (err.name === 'AbortError')
-				return;
-			throw err;
-		}
-	})();
+	const watcher = fsWatch(dirPath, (eventType, filename) => {
+		if (!filename || filename !== "current_scheme") return;
+		debouncedUpdate();
+	});
 
-	return () => ac.abort();
+	watcher.on("error", (err) => {
+		console.error("tinty watcher error:", err)
+	});
+
+	return () => watcher.close();
 }
 
 export async function getSchemeColors(): Promise<string[]> {
