@@ -1,5 +1,4 @@
 import { App, PluginSettingTab, SettingDefinitionItem } from "obsidian";
-import { getSchemeColors } from "./tinty-utils";
 import MyPlugin from "./main";
 
 export interface MySettings {
@@ -30,6 +29,8 @@ export class MySettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: MyPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+		// TODO: still reads as hamber. We need to populate this on plugin load
+		console.log(this.plugin.currentThemeColors);
 	}
 
 	getSettingDefinitions(): SettingDefinitionItem[] {
@@ -40,6 +41,14 @@ export class MySettingTab extends PluginSettingTab {
 					type: 'text',
 					key: 'sampleValue',
 					placeholder: 'Lorem ipsum',
+				},
+			},
+			{
+				name: 'Test',
+				control: {
+					type: 'text',
+					key: 'test',
+					placeholder: this.plugin.currentThemeColors[1],
 				},
 			},
 		];
