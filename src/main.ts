@@ -9,11 +9,12 @@ export default class ObsidianTintyPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+		this.currentThemeColors = await getSchemeColors();
+		await updateObsidianTheme();
 		this.addSettingTab(new MySettingTab(this.app, this));
 
 		// update on startup
 		this.app.workspace.onLayoutReady(async () => {
-			await updateObsidianTheme();
 		});
 
 		// update while running

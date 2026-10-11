@@ -37,7 +37,10 @@ async function readTintyTheme(): Promise<string> {
 
 export function setThemeWatcher(plugin: ObsidianTintyPlugin): () => void {
 	const dirPath = "/home/tate/.local/share/tinted-theming/tinty/";
-	const debouncedUpdate = debounceFactory(() => updateObsidianTheme(), 300);
+	const debouncedUpdate = debounceFactory(async () => {
+		await updateObsidianTheme();
+		plugin.currentThemeColors = await getSchemeColors();
+	}, 300);
 
 	const watcher = fsWatch(dirPath, (eventType, filename) => {
 		if (!filename || filename !== "current_scheme") return;
@@ -52,10 +55,9 @@ export function setThemeWatcher(plugin: ObsidianTintyPlugin): () => void {
 }
 
 export async function getSchemeColors(): Promise<string[]> {
-	console.log('getting scheme colors');
+	console.log('running getSchemeColors');
 	const tintyThemePath = await getTintyThemePath();
 	let content = await readFile(tintyThemePath, { encoding: 'utf8' });
-	console.log(content.split('\n').splice(1, 16));
 
 	return content.split('\n').splice(1, 16);
 }
