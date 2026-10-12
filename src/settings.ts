@@ -25,12 +25,12 @@ export const TEMPLATE_DEFAULTS: ColorMapping = {
 
 export class MySettingTab extends PluginSettingTab {
 	plugin: MyPlugin;
+	currentThemeColors: string[];
 
 	constructor(app: App, plugin: MyPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
-		// TODO: still reads as hamber. We need to populate this on plugin load
-		console.log(this.plugin.currentThemeColors);
+		this.currentThemeColors = plugin.currentThemeColors;
 	}
 
 	getSettingDefinitions(): SettingDefinitionItem[] {
@@ -46,9 +46,12 @@ export class MySettingTab extends PluginSettingTab {
 			{
 				name: 'Test',
 				control: {
-					type: 'text',
+					type: 'dropdown',
 					key: 'test',
-					placeholder: this.plugin.currentThemeColors[1],
+					options: {
+						value: 'Display',
+						value2: this.currentThemeColors[0] ?? '',
+					},
 				},
 			},
 		];

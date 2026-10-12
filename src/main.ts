@@ -5,19 +5,22 @@ import { updateObsidianTheme, setThemeWatcher } from "./tinty-utils";
 
 export default class ObsidianTintyPlugin extends Plugin {
 	settings!: MySettings;
-	currentThemeColors: string[] = ['hamber',];
+	currentThemeColors: string[] = [];
 
 	async onload() {
 		await this.loadSettings();
+
+		// populate colors
 		this.currentThemeColors = await getSchemeColors();
 		await updateObsidianTheme();
+
 		this.addSettingTab(new MySettingTab(this.app, this));
 
-		// update on startup
+		// REMOVE IF EVERYTHING WORKS
 		this.app.workspace.onLayoutReady(async () => {
 		});
 
-		// update while running
+		// watcher for live theme updates
 		this.register(setThemeWatcher(this));
 
 	}
