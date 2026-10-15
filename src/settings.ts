@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, SettingDefinitionItem } from "obsidian";
+import { App, PluginSettingTab, SettingDefinitionItem, ColorComponent } from "obsidian";
 import MyPlugin from "./main";
 
 export interface MySettings {
@@ -7,20 +7,6 @@ export interface MySettings {
 
 export const DEFAULT_SETTINGS: Partial<MySettings> = {
 	sampleValue: "sample",
-}
-
-interface ColorMapping {
-	"--background-primary": number;
-	"--background-primary-alt": number;
-	"--background-secondary": number;
-	"--background-secondary-alt": number;
-}
-
-export const TEMPLATE_DEFAULTS: ColorMapping = {
-	"--background-primary": 0,
-	"--background-primary-alt": 1,
-	"--background-secondary": 0,
-	"--background-secondary-alt": 1,
 }
 
 export class MySettingTab extends PluginSettingTab {
@@ -44,7 +30,15 @@ export class MySettingTab extends PluginSettingTab {
 		const settingsMap: SettingDefinitionItem[] = base16Keys.map((key, index) => ({
 			name: key,
 			render: (setting) => {
-				setting.addColorPicker((color) =>
+				let picker: ColorComponent;
+				setting
+					.addExtraButton((btn) => btn.setIcon('reset').setTooltip('Restore default').onClick(async() => {
+						// const def = this.defaultThemeColors[index];
+						// picker.setValue(def)
+						// this.currentThemeColors[index] = def;
+						// saveData
+					}))
+					.addColorPicker((color) =>
 					color
 						.setValue(this.currentThemeColors[index]!)
 						.onChange(async (value) => {
@@ -55,21 +49,7 @@ export class MySettingTab extends PluginSettingTab {
 			},
 		}));
 
-		// return settingsMap;
-		return [
-			{
-				name: 'Enable feature X',
-				render: (setting) => {
-					setting.addColorPicker((color) => color
-						.setValue('#111111')
-						.onChange(async (value) => {
-							console.log(value);
-							// this.plugin.applyFeatureX();
-							await this.plugin.saveData(this.plugin.settings);
-						}));
-				},
-			}
-		];
+		return settingsMap;
 	}
 }
 

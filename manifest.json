@@ -2,7 +2,7 @@
 	"id": "obsidian-tinty",
 	"name": "Obsidian Tinty",
 	"version": "1.0.0",
-	"minAppVersion": "1.0.0",
+	"minAppVersion": "1.1.0",
 	"description": "Allows Obsidian's colors to sync with Tinty",
 	"author": "Plant900",
 	"authorUrl": "https://obsidian.md",
