@@ -12,7 +12,6 @@ async function getCurrentTintyScheme(): Promise<string> {
 
 async function getTintyThemePath(): Promise<string> {
 	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/plugins/obsidian-tinty/resources/themes/";
-	// TODO: proper error handling
 	const scheme = await getCurrentTintyScheme();
 	const schemeFile = scheme + ".css";
 	const allThemes = await readdir(path)
