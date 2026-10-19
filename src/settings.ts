@@ -53,20 +53,38 @@ export class MySettingTab extends PluginSettingTab {
 			render: (setting) => {
 				let picker: ColorComponent;
 				setting
-					.addExtraButton((btn) => btn.setIcon('reset').setTooltip('Restore default').onClick(async() => {
+					.addExtraButton((btn) => btn.setIcon('reset').setTooltip('Restore default').onClick(async () => {
+						console.log(this.plugin.settings.customizations);
 						// const def = this.defaultThemeColors[index];
 						// picker.setValue(def)
 						// this.currentThemeColors[index] = def;
 						// saveData
 					}))
 					.addColorPicker((color) =>
-					color
-						.setValue(this.currentThemeColors[index]!)
-						.onChange(async (value) => {
-							console.log(value);
-							await this.plugin.saveData(this.plugin.settings);
-						})
-				);
+						color
+							.setValue(this.currentThemeColors[index]!)
+							.onChange(async (value) => {
+								const scheme = this.plugin.settings.currentScheme;
+								if (!scheme) {
+									console.log('no scheme');
+									return;
+								};
+
+								// Initialize scheme customizations if needed
+								if (!this.plugin.settings.customizations[scheme]) {
+									this.plugin.settings.customizations[scheme] = {};
+								}
+								// Save the customization
+								(this.plugin.settings.customizations[scheme] as any)[key] = value;
+								await this.plugin.saveSettings();
+
+								// Regenerate theme (you'll implement this later)
+								// await this.plugin.regenerateTheme();
+
+								console.log(value);
+								await this.plugin.saveData(this.plugin.settings);
+							})
+					);
 			},
 		}));
 

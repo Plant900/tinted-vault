@@ -60,3 +60,4 @@ export async function getSchemeColors(): Promise<string[]> {
 
 	return content.split('\n').splice(1, 16);
 }
+
