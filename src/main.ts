@@ -13,12 +13,9 @@ export default class ObsidianTintyPlugin extends Plugin {
 		// populate colors
 		this.currentThemeColors = await getSchemeColors();
 		await updateObsidianTheme();
+		console.log('settings', this.settings);
 
 		this.addSettingTab(new MySettingTab(this.app, this));
-
-		// REMOVE IF EVERYTHING WORKS
-		this.app.workspace.onLayoutReady(async () => {
-		});
 
 		// watcher for live theme updates
 		this.register(setThemeWatcher(this));

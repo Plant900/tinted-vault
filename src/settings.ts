@@ -1,4 +1,5 @@
 import { App, PluginSettingTab, SettingDefinitionItem, ColorComponent } from "obsidian";
+import { getSchemeColors } from "./tinty-utils";
 import MyPlugin from "./main";
 
 export interface MySettings {
@@ -51,18 +52,28 @@ export class MySettingTab extends PluginSettingTab {
 		const settingsMap: SettingDefinitionItem[] = base16Keys.map((key, index) => ({
 			name: key,
 			render: (setting) => {
-				let picker: ColorComponent;
 				setting
 					.addExtraButton((btn) => btn.setIcon('reset').setTooltip('Restore default').onClick(async () => {
-						console.log(this.plugin.settings.customizations);
-						// const def = this.defaultThemeColors[index];
-						// picker.setValue(def)
-						// this.currentThemeColors[index] = def;
-						// saveData
+						const scheme = this.plugin.settings.currentScheme;
+						if (!scheme || !this.plugin.settings.customizations[scheme]) return;
+
+						// Delete customization
+						delete (this.plugin.settings.customizations[scheme] as unknown)[key];
+						await this.plugin.saveSettings();
+
+						// Restore picker to default val
+						const defaults = await getSchemeColors();
+						this.picker.setValue(defaults[index]);
+
+						// Regenerate theme
+						// await this.plugin.regenerateTheme();
 					}))
-					.addColorPicker((color) =>
+					.addColorPicker((color) => {
+						const schemeCust = this.plugin.settings.customizations[this.plugin.settings.currentScheme] || {};
+						const effectiveColor = (schemeCust as any)[key] ?? this.currentThemeColors[index]
+
 						color
-							.setValue(this.currentThemeColors[index]!)
+							.setValue(effectiveColor)
 							.onChange(async (value) => {
 								const scheme = this.plugin.settings.currentScheme;
 								if (!scheme) {
@@ -75,7 +86,7 @@ export class MySettingTab extends PluginSettingTab {
 									this.plugin.settings.customizations[scheme] = {};
 								}
 								// Save the customization
-								(this.plugin.settings.customizations[scheme] as any)[key] = value;
+								(this.plugin.settings.customizations[scheme] as unknown)[key] = value;
 								await this.plugin.saveSettings();
 
 								// Regenerate theme (you'll implement this later)
@@ -84,6 +95,7 @@ export class MySettingTab extends PluginSettingTab {
 								console.log(value);
 								await this.plugin.saveData(this.plugin.settings);
 							})
+					}
 					);
 			},
 		}));
