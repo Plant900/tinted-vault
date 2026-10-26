@@ -1,8 +1,4 @@
-import { App, PluginSettingTab, SettingDefinitionItem, ColorComponent } from "obsidian";
-import { getSchemeColors } from "./tinty-utils";
-import MyPlugin from "./main";
-
-export interface MySettings {
+import { App, PluginSettingTab, SettingDefinitionItem, ColorComponent } from "obsidian"; import { getSchemeColors } from "./tinty-utils"; import MyPlugin from "./main"; export interface MySettings {
 	currentScheme: string;
 	customizations: Record<string, SchemeCustomization>;
 }

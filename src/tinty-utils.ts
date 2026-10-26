@@ -1,9 +1,9 @@
 import { debounceFactory } from "./utils";
-import { watch as fsWatch } from "fs"; 
+import { watch as fsWatch } from "fs";
 import { readFile, readdir, writeFile } from "fs/promises";
 import ObsidianTintyPlugin from "./main";
 
-async function getCurrentTintyScheme(): Promise<string> {
+export async function getCurrentTintyScheme(): Promise<string> {
 	const path = "/home/tate/.local/share/tinted-theming/tinty/current_scheme";
 	// TODO: proper error handling
 	const data = await readFile(path);
@@ -19,7 +19,7 @@ async function getTintyThemePath(): Promise<string> {
 }
 
 export async function updateObsidianTheme(): Promise<void> {
-	const dir = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes"
+	const dir = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes";
 	const obsidianThemePath = dir + "/obsidian-tinty.css";
 	const content = await readTintyTheme();
 

@@ -1,7 +1,7 @@
 import { Plugin } from 'obsidian';
 import { getSchemeColors } from './tinty-utils';
 import { MySettings, MySettingTab, DEFAULT_SETTINGS } from "./settings";
-import { updateObsidianTheme, setThemeWatcher } from "./tinty-utils";
+import { updateObsidianTheme, setThemeWatcher, getCurrentTintyScheme } from "./tinty-utils";
 
 export default class ObsidianTintyPlugin extends Plugin {
 	settings!: MySettings;
@@ -14,6 +14,8 @@ export default class ObsidianTintyPlugin extends Plugin {
 		this.currentThemeColors = await getSchemeColors();
 		await updateObsidianTheme();
 		console.log('settings', this.settings);
+		this.settings.currentScheme = await getCurrentTintyScheme();
+		await this.saveSettings();
 
 		this.addSettingTab(new MySettingTab(this.app, this));
 
