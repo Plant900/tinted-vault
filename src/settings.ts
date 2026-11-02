@@ -66,7 +66,7 @@ export class MySettingTab extends PluginSettingTab {
 					}))
 					.addColorPicker((color) => {
 						const schemeCust = this.plugin.settings.customizations[this.plugin.settings.currentScheme] || {};
-						const effectiveColor = (schemeCust as any)[key] ?? this.currentThemeColors[index]
+						const effectiveColor = (schemeCust as unknown)[key] ?? this.currentThemeColors[index];
 
 						color
 							.setValue(effectiveColor)
