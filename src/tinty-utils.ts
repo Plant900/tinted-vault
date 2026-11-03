@@ -11,7 +11,7 @@ export async function getCurrentTintyScheme(): Promise<string> {
 }
 
 async function getTintyThemePath(): Promise<string> {
-	const path = "/home/tate/Documents/Obsidian Test Vault/.obsidian/plugins/obsidian-tinty/resources/themes/";
+	const path = "/home/tate/Documents/Obsidian Things/Test Vault/.obsidian/plugins/obsidian-tinty/resources/themes/";
 	const scheme = await getCurrentTintyScheme();
 	const schemeFile = scheme + ".css";
 	const allThemes = await readdir(path)
@@ -19,7 +19,7 @@ async function getTintyThemePath(): Promise<string> {
 }
 
 export async function updateObsidianTheme(): Promise<void> {
-	const dir = "/home/tate/Documents/Obsidian Test Vault/.obsidian/themes";
+	const dir = "/home/tate/Documents/Obsidian Things/Test Vault/.obsidian/themes";
 	const obsidianThemePath = dir + "/obsidian-tinty.css";
 	const content = await readTintyTheme();
 
