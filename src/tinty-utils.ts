@@ -61,3 +61,13 @@ export async function getSchemeColors(): Promise<string[]> {
 	return content.split('\n').splice(1, 16);
 }
 
+export function makeCustomThemeCopy(name: string): string {
+	// find corresponding theme in the folder based on the name, make a copy for customization
+	return 'success';
+}
+
+export function changeThemeBase16Val(oldColor: string, newColor: string): string {
+	// find and replace the corresponding CSS color variable in the theme file
+	return 'success';
+}
+
