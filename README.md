@@ -1,90 +1,81 @@
-# Obsidian Sample Plugin
+# Tinted Vault
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Keep Obsidian's colors in sync with your system theme. Tinted Vault follows the
+active [tinty](https://github.com/tinted-theming/tinty) base16 scheme, so a single
+`tinty apply` recolors your terminal, editor and vault together.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+<!-- TODO: add a GIF of `tinty apply` changing the vault live -->
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+## Features
 
-## First time developing plugins?
+- **Follows tinty live.** Run `tinty apply <scheme>` and the vault updates within a moment, with no reload.
+- **Per-scheme color overrides.** Adjust any of the 16 base16 colors from the settings tab, with a
+  live preview while you drag. Overrides are saved per scheme, and each color can be reset to the scheme's own value.
+- **No theme files.** Colors are applied as CSS variables, so disabling the plugin restores your
+  vault's normal appearance.
 
-Quick starting guide for new plugin devs:
+## Requirements
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+- Obsidian 1.13 or newer, desktop only
+- [tinty](https://github.com/tinted-theming/tinty) installed, with a base16 scheme applied at least once
+  (`tinty apply base16-<name>`)
 
-## Releasing new releases
+## Installation
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+The plugin isn't in the community plugin directory yet. Install it with either method:
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+**With BRAT (recommended)**
+1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) from the community plugins.
+2. In BRAT's settings, choose *Add beta plugin* and enter `Plant900/tinted-vault`.
+3. Enable **Tinted Vault** under Settings → Community plugins.
 
-## Adding your plugin to the community plugin list
+**Manually**
+1. Download `main.js`, `manifest.json` and `styles.css` from the
+   [latest release](https://github.com/Plant900/tinted-vault/releases/latest).
+2. Put them in `<your vault>/.obsidian/plugins/tinted-vault/`.
+3. Reload Obsidian and enable **Tinted Vault** under Settings → Community plugins.
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+For best results, use Obsidian's default theme (Settings → Appearance → Themes).
 
-## How to use
+## Usage
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+- Change schemes as usual with `tinty apply <scheme>`. Obsidian follows automatically.
+- Settings → Tinted Vault:
+  - **Path to tinty:** set this if Obsidian can't find `tinty`. Apps started from a desktop
+    launcher often don't inherit your shell's `PATH`, for example when tinty lives in `~/.cargo/bin`.
+  - **base00 – base0F:** a color picker for each base16 color. Changes preview live and are saved
+    for the current scheme only. The reset button restores the scheme's color.
 
-## Manually installing the plugin
+## How it works
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+1. On load, the plugin asks tinty for its data directory (`tinty config --data-dir-path`), falling back to
+   `$XDG_DATA_HOME/tinted-theming/tinty` or `~/.local/share/tinted-theming/tinty`.
+2. It reads the current scheme name from `current_scheme`, then loads that scheme's palette from tinty's scheme
+   YAML. User-made schemes in `custom-schemes/` take priority.
+3. Any overrides saved for that scheme are merged on top, and the 16 results are set as CSS variables
+   (`--base00` … `--base0F`) on `<body>`.
+4. The plugin's `styles.css` maps Obsidian's own variables (`--background-primary`, `--text-accent`, …)
+   onto those 16 colors.
+5. A file watcher on `current_scheme` repeats steps 2–3 whenever tinty switches schemes.
 
-## Improve code quality with eslint
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+## Limitations
 
-## Funding URL
+- Only the 16 base16 colors are used (base24 schemes work, using their first 16 colors).
+- Colors apply to the main window, not to popout windows (yet).
+- Desktop only, because it needs to read tinty's files and run the tinty CLI.
 
-You can include funding URLs where people who use your plugin can financially support it.
+## Development
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
+```bash
+npm install
+npm run dev     # rebuild main.js on every change
+npm run build   # type-check and build for production
+npm run lint
 ```
 
-If you have multiple URLs, you can also do:
+For development, clone the repo into a test vault's `.obsidian/plugins/tinted-vault/` folder.
+Releases are built by GitHub Actions when a version tag (e.g. `0.1.0`) is pushed.
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
+## License
 
-## API Documentation
-
-See https://docs.obsidian.md
+[0BSD](LICENSE)

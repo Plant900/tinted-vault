@@ -1,46 +1,38 @@
 import { debounceFactory } from "./utils";
-import { watch as fsWatch } from "fs";
+import { existsSync, watch as fsWatch } from "fs";
 import { readFile } from "fs/promises";
-import { normalizePath } from "obsidian";
-import ObsidianTintyPlugin from "./main";
+import { join } from "path";
+import { Palette, parsePalette } from "./base16";
+import TintedVaultPlugin from "./main";
 
-export async function getCurrentTintyScheme(plugin: ObsidianTintyPlugin): Promise<string> {
-	// TODO: proper error handling
+export async function getCurrentTintyScheme(plugin: TintedVaultPlugin): Promise<string> {
 	const data = await readFile(plugin.paths.currentSchemeFile, { encoding: 'utf8' });
 	return data.trim();
 }
 
+/**
+ * Loads a scheme's colors from tinty's own scheme files.
+ * A scheme id like "base16-everforest" maps to <system>/<slug>.yaml; user-made
+ * schemes in custom-schemes/ take priority over the downloaded schemes repo.
+ */
+export async function loadSchemePalette(plugin: TintedVaultPlugin, scheme: string): Promise<Palette> {
+	const dash = scheme.indexOf('-');
+	if (dash === -1) throw new Error(`unrecognized scheme id "${scheme}"`);
+	const system = scheme.slice(0, dash);
+	const slug = scheme.slice(dash + 1);
 
-async function getTintyThemePath(plugin: ObsidianTintyPlugin): Promise<string | null> {
-	const dir = plugin.paths.themesSourceDir;
-	const scheme = await getCurrentTintyScheme(plugin);
-	const target = normalizePath(`${dir}/${scheme}.css`);
-	// adapter.list returns full vault-relative paths, so compare against the full path
-	const { files } = await plugin.app.vault.adapter.list(dir);
-	return files.includes(target) ? target : null;
+	const dataDir = plugin.paths.tintyDataDir;
+	const candidates = [
+		join(dataDir, "custom-schemes", system, `${slug}.yaml`),
+		join(dataDir, "repos", "schemes", system, `${slug}.yaml`),
+	];
+	const schemeFile = candidates.find((p) => existsSync(p));
+	if (!schemeFile) throw new Error(`no scheme file found for "${scheme}"`);
+
+	return parsePalette(await readFile(schemeFile, { encoding: 'utf8' }));
 }
 
-
-export async function updateObsidianTheme(plugin: ObsidianTintyPlugin): Promise<void> {
-	const obsidianThemePath = plugin.paths.obsidianThemeFile;
-	const content = await readTintyTheme(plugin);
-
-	console.log('writing theme to', obsidianThemePath);
-	await plugin.app.vault.adapter.write(obsidianThemePath, content);
-}
-
-
-async function readTintyTheme(plugin: ObsidianTintyPlugin): Promise<string> {
-	const tintyThemePath = await getTintyThemePath(plugin);
-	if (!tintyThemePath) {
-		const scheme = await getCurrentTintyScheme(plugin);
-		throw new Error(`obsidian-tinty: no theme CSS found for scheme "${scheme}"`);
-	}
-	return plugin.app.vault.adapter.read(tintyThemePath);
-}
-
-
-export function setThemeWatcher(plugin: ObsidianTintyPlugin): () => void {
+export function setThemeWatcher(plugin: TintedVaultPlugin): () => void {
 	const debouncedUpdate = debounceFactory(async () => {
 		await plugin.syncWithTinty();
 	}, 300);
@@ -55,24 +47,4 @@ export function setThemeWatcher(plugin: ObsidianTintyPlugin): () => void {
 	});
 
 	return () => watcher.close();
-}
-
-
-export async function getSchemeColors(plugin: ObsidianTintyPlugin): Promise<string[]> {
-	console.log('running getSchemeColors');
-	const content = await readTintyTheme(plugin);
-
-	return content.split('\n').splice(1, 16);
-}
-
-
-export function makeCustomThemeCopy(name: string): string {
-	// find corresponding theme in the folder based on the name, make a copy for customization
-	return 'success';
-}
-
-
-export function changeThemeBase16Val(oldColor: string, newColor: string): string {
-	// find and replace the corresponding CSS color variable in the theme file
-	return 'success';
 }

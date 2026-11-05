@@ -3,8 +3,7 @@ import { promisify } from "util";
 import { homedir } from "os";
 import { join } from "path";
 import { existsSync } from "fs";
-import { normalizePath } from "obsidian";
-import type ObsidianTintyPlugin from "./main";
+import type TintedVaultPlugin from "./main";
 
 const execFileAsync = promisify(execFile);
 
@@ -13,10 +12,6 @@ export interface PluginPaths {
 	tintyDataDir: string;
 	/** Absolute path to the file tinty updates on `tinty apply`. */
 	currentSchemeFile: string;
-	/** Vault-relative path. Access through `app.vault.adapter`. */
-	themesSourceDir: string;
-	/** Vault-relative path to the theme CSS file this plugin writes. */
-	obsidianThemeFile: string;
 }
 
 /**
@@ -39,18 +34,12 @@ async function resolveTintyDataDir(tintyBin: string): Promise<string | null> {
 	return existsSync(fallback) ? fallback : null;
 }
 
-export async function resolvePaths(plugin: ObsidianTintyPlugin): Promise<PluginPaths | null> {
+export async function resolvePaths(plugin: TintedVaultPlugin): Promise<PluginPaths | null> {
 	const tintyDataDir = await resolveTintyDataDir(plugin.settings.tintyPath);
 	if (!tintyDataDir) return null;
-
-	const configDir = plugin.app.vault.configDir;
-	// manifest.dir is typed as optional, so build the standard location if it's missing
-	const pluginDir = plugin.manifest.dir ?? `${configDir}/plugins/${plugin.manifest.id}`;
 
 	return {
 		tintyDataDir,
 		currentSchemeFile: join(tintyDataDir, "current_scheme"),
-		themesSourceDir: normalizePath(`${pluginDir}/resources/themes`),
-		obsidianThemeFile: normalizePath(`${configDir}/themes/obsidian-tinty.css`),
 	};
 }

@@ -1,47 +1,23 @@
 import { App, PluginSettingTab, SettingDefinitionItem } from "obsidian";
-import { getSchemeColors } from "./tinty-utils";
-import MyPlugin from "./main";
+import { BASE16_KEYS, SchemeCustomization } from "./base16";
+import TintedVaultPlugin from "./main";
 
-export interface MySettings {
+export interface TintedVaultSettings {
 	tintyPath: string;
 	currentScheme: string;
 	customizations: Record<string, SchemeCustomization>;
 }
 
-interface SchemeCustomization {
-	base00?: string;
-	base01?: string;
-	base02?: string;
-	base03?: string;
-	base04?: string;
-	base05?: string;
-	base06?: string;
-	base07?: string;
-	base08?: string;
-	base09?: string;
-	base0A?: string;
-	base0B?: string;
-	base0C?: string;
-	base0D?: string;
-	base0E?: string;
-	base0F?: string;
-}
-
-type BaseKey = keyof SchemeCustomization;
-
-// Used if a scheme file has fewer than 16 colors; <input type="color"> needs a valid #rrggbb
-const FALLBACK_COLOR = '#000000';
-
-export const DEFAULT_SETTINGS: MySettings = {
+export const DEFAULT_SETTINGS: TintedVaultSettings = {
 	tintyPath: "tinty",
 	currentScheme: "",
 	customizations: {}
 }
 
-export class MySettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+export class TintedVaultSettingTab extends PluginSettingTab {
+	plugin: TintedVaultPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: TintedVaultPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -62,19 +38,12 @@ export class MySettingTab extends PluginSettingTab {
 			},
 		};
 
-		// Without resolved paths there are no theme colors to show
-		if (!this.plugin.paths) {
+		// Without a loaded scheme there are no colors to show
+		if (!this.plugin.palette) {
 			return [tintyPathSetting];
 		}
 
-		const base16Keys: BaseKey[] = [
-			'base00', 'base01', 'base02', 'base03',
-			'base04', 'base05', 'base06', 'base07',
-			'base08', 'base09', 'base0A', 'base0B',
-			'base0C', 'base0D', 'base0E', 'base0F'
-		];
-
-		const settingsMap: SettingDefinitionItem[] = base16Keys.map((key, index) => ({
+		const settingsMap: SettingDefinitionItem[] = BASE16_KEYS.map((key) => ({
 			name: key,
 			render: (setting) => {
 				// Create the input first so both handlers can reference it
@@ -83,35 +52,36 @@ export class MySettingTab extends PluginSettingTab {
 				const getCust = (): SchemeCustomization | undefined =>
 					this.plugin.settings.customizations[this.plugin.settings.currentScheme];
 
-				// Initial value: customization if present, otherwise the theme default
-				input.value = getCust()?.[key] ?? this.plugin.currentThemeColors[index] ?? FALLBACK_COLOR;
+				// Scheme color for this key; read at call time so it's never stale
+				const schemeColor = (): string => this.plugin.palette?.[key] ?? '#000000';
 
-				input.addEventListener('change', async () => {
+				// Initial value: customization if present, otherwise the scheme's color
+				input.value = getCust()?.[key] ?? schemeColor();
+
+				// 'input' fires continuously while dragging: update the override and preview it live
+				input.addEventListener('input', () => {
 					const scheme = this.plugin.settings.currentScheme;
 					if (!scheme) return;
 
-					if (!this.plugin.settings.customizations[scheme]) {
-						this.plugin.settings.customizations[scheme] = {};
-					}
+					this.plugin.settings.customizations[scheme] ??= {};
 					this.plugin.settings.customizations[scheme][key] = input.value;
-					await this.plugin.saveSettings();
+					this.plugin.applyColors();
+				});
 
-					// await this.plugin.regenerateTheme();
+				// 'change' fires once when the picker closes: save to disk then
+				input.addEventListener('change', () => {
+					void this.plugin.saveSettings();
 				});
 
 				setting.addExtraButton((btn) =>
 					btn.setIcon('reset').setTooltip('Restore default').onClick(async () => {
-						const scheme = this.plugin.settings.currentScheme;
 						const cust = getCust();
-						if (!scheme || !cust) return;
+						if (!cust) return;
 
 						delete cust[key];
+						this.plugin.applyColors();
+						input.value = schemeColor(); // updates the picker; fires no events
 						await this.plugin.saveSettings();
-
-						const defaults = await getSchemeColors(this.plugin);
-						input.value = defaults[index] ?? FALLBACK_COLOR; // updates the picker; fires no 'change' event
-
-						// await this.plugin.regenerateTheme();
 					})
 				);
 
@@ -122,4 +92,3 @@ export class MySettingTab extends PluginSettingTab {
 		return [tintyPathSetting, ...settingsMap];
 	}
 }
-

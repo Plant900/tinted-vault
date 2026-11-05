@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "tinted-vault",
+	"version": "0.1.0",
+	"description": "This plugin allows Obsidian's colors to be in sync with those set by the Tinty CLI tool.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {

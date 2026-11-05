@@ -1,11 +1,10 @@
 {
-	"id": "obsidian-tinty",
-	"name": "Obsidian Tinty",
-	"version": "1.0.0",
+	"id": "tinted-vault",
+	"name": "Tinted Vault",
+	"version": "0.1.0",
 	"minAppVersion": "1.13.0",
-	"description": "Allows Obsidian's colors to sync with Tinty",
+	"description": "Syncs your colors with the active Tinty scheme, with live per-color overrides.",
 	"author": "Plant900",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"authorUrl": "https://github.com/Plant900",
 	"isDesktopOnly": true
 }
