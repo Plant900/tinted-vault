@@ -2,17 +2,15 @@
 
 Keep Obsidian's colors in sync with your system theme. Tinted Vault follows the
 active [tinty](https://github.com/tinted-theming/tinty) base16 scheme, so a single
-`tinty apply` recolors your terminal, editor and vault together.
+`tinty apply` recolors your terminal and Obsidian vault together.
 
 <!-- TODO: add a GIF of `tinty apply` changing the vault live -->
 
 ## Features
 
-- **Follows tinty live.** Run `tinty apply <scheme>` and the vault updates within a moment, with no reload.
-- **Per-scheme color overrides.** Adjust any of the 16 base16 colors from the settings tab, with a
-  live preview while you drag. Overrides are saved per scheme, and each color can be reset to the scheme's own value.
-- **No theme files.** Colors are applied as CSS variables, so disabling the plugin restores your
-  vault's normal appearance.
+- **Follows tinty live:** Run `tinty apply <scheme>` and the vault's colors will quickly change to match.
+- **Per-scheme color overrides.** Adjust any of the 16 base16 colors from the settings tab (overrides are saved per-scheme).
+- **No theme files.** Colors are applied as CSS variables, so disabling the plugin removes all colors.
 
 ## Requirements
 
@@ -22,28 +20,28 @@ active [tinty](https://github.com/tinted-theming/tinty) base16 scheme, so a sing
 
 ## Installation
 
-The plugin isn't in the community plugin directory yet. Install it with either method:
+The plugin isn't in the community plugin directory yet.
 
-**With BRAT (recommended)**
+**With BRAT**
 1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) from the community plugins.
 2. In BRAT's settings, choose *Add beta plugin* and enter `Plant900/tinted-vault`.
-3. Enable **Tinted Vault** under Settings → Community plugins.
+3. Enable Tinted Vault under Settings → Community plugins.
 
 **Manually**
 1. Download `main.js`, `manifest.json` and `styles.css` from the
    [latest release](https://github.com/Plant900/tinted-vault/releases/latest).
 2. Put them in `<your vault>/.obsidian/plugins/tinted-vault/`.
-3. Reload Obsidian and enable **Tinted Vault** under Settings → Community plugins.
+3. Reload Obsidian and enable Tinted Vault under Settings → Community plugins.
 
-For best results, use Obsidian's default theme (Settings → Appearance → Themes).
+It has only been tested using Obsidian's default theme.
 
 ## Usage
 
-- Change schemes as usual with `tinty apply <scheme>`. Obsidian follows automatically.
+- Change schemes as usual with `tinty apply <scheme>`; Obsidian will follow automatically.
 - Settings → Tinted Vault:
   - **Path to tinty:** set this if Obsidian can't find `tinty`. Apps started from a desktop
     launcher often don't inherit your shell's `PATH`, for example when tinty lives in `~/.cargo/bin`.
-  - **base00 – base0F:** a color picker for each base16 color. Changes preview live and are saved
+  - **base00 - base0F:** a color picker for each base16 color. Changes preview live and are saved
     for the current scheme only. The reset button restores the scheme's color.
 
 ## How it works
