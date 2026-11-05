@@ -4,7 +4,7 @@ Keep Obsidian's colors in sync with your system theme. Tinted Vault follows the
 active [tinty](https://github.com/tinted-theming/tinty) base16 scheme, so a single
 `tinty apply` recolors your terminal and Obsidian vault together.
 
-<!-- TODO: add a GIF of `tinty apply` changing the vault live -->
+![Running tinty apply recolors the vault](assets/demo.gif)
 
 ## Features
 
